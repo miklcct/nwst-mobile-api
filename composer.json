@@ -9,6 +9,11 @@
             "Miklcct\\Nwst\\" : "src/"
         }
     },
+    "autoload-dev" : {
+        "psr-4" : {
+            "Miklcct\\Nwst\\Test\\" : "test/"
+        }
+    },
     "require" : {
         "php" : ">=7.2"
     }
