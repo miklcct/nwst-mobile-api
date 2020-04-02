@@ -1,0 +1,12 @@
+{
+    "name" : "miklcct/nwst-mobile-api",
+    "description" : "This is a PHP wrapper to call the Citybus / NWFB mobile API",
+    "type" : "library",
+    "version" : "0.0.1",
+    "license" : "Apache-2.0",
+    "autoload" : {
+        "psr-4" : {
+            "Miklcct\\Nwst\\" : "src/"
+        }
+    }
+}
