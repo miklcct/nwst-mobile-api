@@ -4,15 +4,52 @@ declare(strict_types=1);
 namespace Miklcct\Nwst\Model;
 
 class Route {
-    const COMPANY_CITYBUS = 'CTB';
+    const COMPANY_CTB = 'CTB';
     const COMPANY_NWFB = 'NWFB';
+    const COMPANY_KMB = 'KMB';
+    const COMPANY_LWB = 'LWB';
 
     const BRAND_CITYFLYER = 1;
     const BRAND_CITYBUS = 2;
+    const BRAND_RICKSHAW = 3;
     const BRAND_NWFB = 4;
 
     const OUTBOUND = 'O';
     const INBOUND = 'I';
+
+    public function __construct(
+        string $company
+        , string $number
+        , string $destination_code
+        , int $number_of_ways
+        , string $from
+        , string $to
+        , int $brand
+        , string $id
+        , int $default_variant
+        , string $bound
+        , string $service_type
+        , ?string $joint_company
+        , int $from_stop
+        , int $to_stop
+        , bool $is_split
+    ) {
+        $this->company = $company;
+        $this->number = $number;
+        $this->destination_code = $destination_code;
+        $this->number_of_ways = $number_of_ways;
+        $this->from = $from;
+        $this->to = $to;
+        $this->brand = $brand;
+        $this->id = $id;
+        $this->default_variant = $default_variant;
+        $this->bound = $bound;
+        $this->service_type = $service_type;
+        $this->joint_company = $joint_company;
+        $this->from_stop = $from_stop;
+        $this->to_stop = $to_stop;
+        $this->is_split = $is_split;
+    }
 
     /** @var string CTB or NWFB */
     public $company;
@@ -36,7 +73,7 @@ class Route {
     public $bound;
     /** @var string e.g. Monday to Friday only */
     public $service_type;
-    /** @var string jointly-operated company, e.g. KMB */
+    /** @var string|null jointly-operated company, e.g. KMB */
     public $joint_company;
     /** @var string The initial stop sequence in the default variant */
     public $from_stop;
