@@ -9,6 +9,7 @@ use Miklcct\Nwst\Model\VariantInfo;
 use function array_filter;
 use function array_map;
 use function explode;
+use function Miklcct\Nwst\parse_int;
 
 class VariantListParser {
     /**
@@ -28,10 +29,10 @@ class VariantListParser {
 
     protected function parseLine(string $line) : RouteVariant {
         $segments = explode('||', $line);
-        $segments[0] = (int)$segments[0];
+        $segments[0] = parse_int($segments[0]);
         $segments[2] = Rdv::parse($segments[2]);
         $segments[4] = VariantInfo::parse($segments[4], '***');
-        if ($segments[5] === '') $segments[6] = NULL;
+        if ($segments[5] === '') $segments[5] = NULL;
         return new RouteVariant(...$segments);
     }
 }

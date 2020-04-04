@@ -8,9 +8,8 @@ use Miklcct\Nwst\Model\RouteStop;
 use function array_filter;
 use function array_map;
 use function explode;
-use function filter_var;
-use const FILTER_VALIDATE_FLOAT;
-use const FILTER_VALIDATE_INT;
+use function Miklcct\Nwst\parse_float;
+use function Miklcct\Nwst\parse_int;
 
 class StopListParser {
     /**
@@ -33,22 +32,22 @@ class StopListParser {
         return new RouteStop(
             // $segments[0] is always 'X0'
             Rdv::parse($segments[1])
-            , filter_var($segments[2], FILTER_VALIDATE_INT)
-            , filter_var($segments[3], FILTER_VALIDATE_INT)
+            , parse_int($segments[2])
+            , parse_int($segments[3])
             , $segments[4]
-            , filter_var($segments[5], FILTER_VALIDATE_FLOAT)
-            , filter_var($segments[6], FILTER_VALIDATE_FLOAT)
+            , parse_float($segments[5])
+            , parse_float($segments[6])
             , $segments[7]
             , $segments[8]
             , $segments[9]
-            , filter_var($segments[10], FILTER_VALIDATE_FLOAT)
+            , parse_float($segments[10]) ?: NULL
             // $segments[11] is always 'Y'
-            , filter_var($segments[12], FILTER_VALIDATE_FLOAT)
-            , filter_var($segments[13], FILTER_VALIDATE_FLOAT)
+            , parse_float($segments[12]) ?: NULL
+            , parse_float($segments[13]) ?: NULL
             // $segments[14] is always 'N'
             // $segments[15] and $segments[16] are the same as $segments[5] and $segments[6]
-            , $segments[16] ?: NULL
-            , $segments[17]
+            , $segments[17] ?: NULL
+            , $segments[18]
         );
     }
 
