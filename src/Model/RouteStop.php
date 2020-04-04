@@ -18,9 +18,9 @@ class RouteStop {
         , string $stopName
         , string $destination
         , string $role
-        , float $adultFare
-        , float $childFare
-        , float $seniorFare
+        , ?float $adultFare
+        , ?float $childFare
+        , ?float $seniorFare
         , ?string $jointCompany
         , string $routeId
     ) {
@@ -77,15 +77,15 @@ class RouteStop {
      */
     public $role;
     /**
-     * @var float
+     * @var float|null
      */
     public $adultFare;
     /**
-     * @var float
+     * @var float|null
      */
     public $childFare;
     /**
-     * @var float
+     * @var float|null
      */
     public $seniorFare;
     /**
