@@ -20,35 +20,35 @@ class Route {
     public function __construct(
         string $company
         , string $number
-        , string $destination_code
-        , int $number_of_ways
+        , string $destinationCode
+        , int $numberOfWays
         , string $from
         , string $to
         , int $brand
         , string $id
-        , int $default_variant
+        , int $defaultVariant
         , string $bound
-        , string $service_type
-        , ?string $joint_company
-        , int $from_stop
-        , int $to_stop
-        , bool $is_split
+        , string $serviceType
+        , ?string $jointCompany
+        , int $fromStop
+        , int $toStop
+        , bool $isSplit
     ) {
         $this->company = $company;
         $this->number = $number;
-        $this->destination_code = $destination_code;
-        $this->number_of_ways = $number_of_ways;
+        $this->destinationCode = $destinationCode;
+        $this->numberOfWays = $numberOfWays;
         $this->from = $from;
         $this->to = $to;
         $this->brand = $brand;
         $this->id = $id;
-        $this->default_variant = $default_variant;
+        $this->defaultVariant = $defaultVariant;
         $this->bound = $bound;
-        $this->service_type = $service_type;
-        $this->joint_company = $joint_company;
-        $this->from_stop = $from_stop;
-        $this->to_stop = $to_stop;
-        $this->is_split = $is_split;
+        $this->serviceType = $serviceType;
+        $this->jointCompany = $jointCompany;
+        $this->fromStop = $fromStop;
+        $this->toStop = $toStop;
+        $this->isSplit = $isSplit;
     }
 
     /** @var string CTB or NWFB */
@@ -56,9 +56,9 @@ class Route {
     /** @var string e.g. 1P, 970 */
     public $number;
     /** @var string 3-letter code */
-    public $destination_code;
+    public $destinationCode;
     /** @var int 0 for circular, 1 for one way, 2 for two ways */
-    public $number_of_ways;
+    public $numberOfWays;
     /** @var string The departing place */
     public $from;
     /** @var string The arriving place */
@@ -68,17 +68,17 @@ class Route {
     /** @var string The identifier for querying the API, normally in the form like 4X--Wah_Fu_(South) */
     public $id;
     /** @var int The default variant ID */
-    public $default_variant;
+    public $defaultVariant;
     /** @var string O for outbound, I for inbound */
     public $bound;
     /** @var string e.g. Monday to Friday only */
-    public $service_type;
+    public $serviceType;
     /** @var string|null jointly-operated company, e.g. KMB */
-    public $joint_company;
+    public $jointCompany;
     /** @var int The initial stop sequence in the default variant */
-    public $from_stop;
+    public $fromStop;
     /** @var int The final stop sequence in the default variant */
-    public $to_stop;
+    public $toStop;
     /** @var bool is the route a circular route split into 2 directions */
-    public $is_split;
+    public $isSplit;
 }
