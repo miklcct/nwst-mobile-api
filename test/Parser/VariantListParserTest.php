@@ -5,6 +5,7 @@ namespace Miklcct\Nwst\Test\Parser;
 
 use Miklcct\Nwst\Model\Rdv;
 use Miklcct\Nwst\Model\Variant;
+use Miklcct\Nwst\Model\VariantIdentifier;
 use Miklcct\Nwst\Parser\VariantListParser;
 use PHPUnit\Framework\TestCase;
 use function file_get_contents;
@@ -17,16 +18,16 @@ class VariantListParserTest extends TestCase {
             new Variant(
                 1
                 , Variant::COLOUR_GREEN
-                , new Rdv('14', 'MAH', 2)
+                , Rdv::parse('14-MAH-2')
                 , 'Departure via Stanley Village, Stanley Fort to Stanley Plaza'
-                , 'NWFB***14-MAH-2***1***30***10405***O'
+                , VariantIdentifier::parse('NWFB***14-MAH-2***1***30***10405***O', '***')
             )
             , new Variant(
                 2
                 , Variant::COLOUR_RED
-                , new Rdv('14', 'SFG', 1)
+                , Rdv::parse('14-SFG-1')
                 , 'Departure via Stanley Village to Stanley Fort'
-                , 'NWFB***14-SFG-1***1***24***10406***O'
+                , VariantIdentifier::parse('NWFB***14-SFG-1***1***24***10406***O', '***')
             )
         ];
         foreach ($variants as $variant) {

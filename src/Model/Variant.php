@@ -12,7 +12,7 @@ class Variant {
         , string $colour
         , Rdv $rdv
         , string $description
-        , string $id
+        , VariantIdentifier $id
     ) {
         $this->serial = $serial;
         $this->colour = $colour;
@@ -38,7 +38,7 @@ class Variant {
      */
     public $description;
     /**
-     * @var string A unique identifier used for querying the API, such as NWFB***14-MAH-2***1***30***10405***O
+     * @var VariantIdentifier A unique identifier used for querying the API, such as NWFB***14-MAH-2***1***30***10405***O
      */
     public $id;
 }
