@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use function file_get_contents;
 
 class RouteListParserTest extends TestCase {
-    public function test() {
+    public function test() : void {
         $result = (new RouteListParser())(file_get_contents(__DIR__ . '/RouteList'));
         /** @var Route[] $routes */
         $routes = [
