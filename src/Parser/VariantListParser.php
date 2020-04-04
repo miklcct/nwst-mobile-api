@@ -5,7 +5,7 @@ namespace Miklcct\Nwst\Parser;
 
 use Miklcct\Nwst\Model\Rdv;
 use Miklcct\Nwst\Model\RouteVariant;
-use Miklcct\Nwst\Model\VariantIdentifier;
+use Miklcct\Nwst\Model\VariantInfo;
 use function array_filter;
 use function array_map;
 use function explode;
@@ -30,7 +30,7 @@ class VariantListParser {
         $segments = explode('||', $line);
         $segments[0] = (int)$segments[0];
         $segments[2] = Rdv::parse($segments[2]);
-        $segments[4] = VariantIdentifier::parse($segments[4], '***');
+        $segments[4] = VariantInfo::parse($segments[4], '***');
         return new RouteVariant(...$segments);
     }
 }

@@ -8,7 +8,7 @@ use function filter_var;
 use function implode;
 use const FILTER_VALIDATE_INT;
 
-class VariantIdentifier {
+class VariantInfo {
     public function __construct(
         string $company
         , Rdv $rdv
