@@ -14,16 +14,16 @@ class RouteListParserTest extends TestCase {
         /** @var Route[] $routes */
         $routes = [
             new Route(
-                Route::COMPANY_CTB
+                'CTB'
                 , '1'
                 , 'FEV'
                 , 2
                 , 'Happy Valley (Upper)'
                 , 'Felix Villas'
-                , Route::BRAND_CITYBUS
+                , 2
                 , '1--Felix_Villas'
                 , 10229
-                , Route::INBOUND
+                , 'I'
                 , ''
                 , NULL
                 , 1
@@ -31,16 +31,16 @@ class RouteListParserTest extends TestCase {
                 , FALSE
             )
             , new Route(
-                Route::COMPANY_NWFB
+                'NWFB'
                 , '4X'
                 , 'WFS'
                 , 2
                 , 'Central (Exchange Square)'
                 , 'Wah Fu (South)'
-                , Route::BRAND_NWFB
+                , 4
                 , '4X--Wah_Fu_(South)'
                 , 10391
-                , Route::INBOUND
+                , 'I'
                 , 'Express, Monday to Saturday only'
                 , NULL
                 , 15
@@ -48,18 +48,18 @@ class RouteListParserTest extends TestCase {
                 , TRUE
             )
             , new Route(
-                Route::COMPANY_NWFB
+                'NWFB'
                 , '110'
                 , 'MOR'
                 , 0
                 , 'Shau Kei Wan'
                 , 'Tsim Sha Tsui (Mody Road)'
-                , Route::BRAND_NWFB
+                , 4
                 , '110-Shau_Kei_Wan-Tsim_Sha_Tsui_(Mody_Road)'
                 , 10898
-                , Route::OUTBOUND
+                , 'O'
                 , 'Circular'
-                , Route::COMPANY_KMB
+                , 'KMB'
                 , 1
                 , 22
                 , FALSE
