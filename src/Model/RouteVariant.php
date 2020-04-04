@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Miklcct\Nwst\Model;
 
-class Variant {
+class RouteVariant {
     public const COLOUR_RED = 'R';
     public const COLOUR_GREEN = 'G';
 
