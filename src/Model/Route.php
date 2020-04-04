@@ -4,18 +4,18 @@ declare(strict_types=1);
 namespace Miklcct\Nwst\Model;
 
 class Route {
-    const COMPANY_CTB = 'CTB';
-    const COMPANY_NWFB = 'NWFB';
-    const COMPANY_KMB = 'KMB';
-    const COMPANY_LWB = 'LWB';
+    public const COMPANY_CTB = 'CTB';
+    public const COMPANY_NWFB = 'NWFB';
+    public const COMPANY_KMB = 'KMB';
+    public const COMPANY_LWB = 'LWB';
 
-    const BRAND_CITYFLYER = 1;
-    const BRAND_CITYBUS = 2;
-    const BRAND_RICKSHAW = 3;
-    const BRAND_NWFB = 4;
+    public const BRAND_CITYFLYER = 1;
+    public const BRAND_CITYBUS = 2;
+    public const BRAND_RICKSHAW = 3;
+    public const BRAND_NWFB = 4;
 
-    const OUTBOUND = 'O';
-    const INBOUND = 'I';
+    public const OUTBOUND = 'O';
+    public const INBOUND = 'I';
 
     public function __construct(
         string $company
