@@ -13,12 +13,14 @@ class RouteVariant {
         , Rdv $rdv
         , string $description
         , VariantInfo $variantInfo
+        , ?string $jointCompany
     ) {
         $this->serial = $serial;
         $this->colour = $colour;
         $this->rdv = $rdv;
         $this->description = $description;
         $this->id = $variantInfo;
+        $this->jointCompany = $jointCompany;
     }
 
     /**
@@ -41,4 +43,8 @@ class RouteVariant {
      * @var VariantInfo A unique identifier used for querying the API, such as NWFB***14-MAH-2***1***30***10405***O
      */
     public $id;
+    /**
+     * @var string|null
+     */
+    public $jointCompany;
 }

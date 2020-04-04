@@ -17,17 +17,27 @@ class VariantListParserTest extends TestCase {
         $variants = [
             new RouteVariant(
                 1
-                , RouteVariant::COLOUR_GREEN
+                , 'G'
                 , Rdv::parse('14-MAH-2')
                 , 'Departure via Stanley Village, Stanley Fort to Stanley Plaza'
                 , VariantInfo::parse('NWFB***14-MAH-2***1***30***10405***O', '***')
+                , NULL
             )
             , new RouteVariant(
                 2
-                , RouteVariant::COLOUR_RED
+                , 'R'
                 , Rdv::parse('14-SFG-1')
                 , 'Departure via Stanley Village to Stanley Fort'
                 , VariantInfo::parse('NWFB***14-SFG-1***1***24***10406***O', '***')
+                , NULL
+            )
+            , new RouteVariant(
+                1
+                , 'G'
+                , Rdv::parse('905-WCF-1')
+                , 'Normal Routeing'
+                , VariantInfo::parse('NWFB***905-WCF-1***1***30***10612***I', '***')
+                , 'KMB'
             )
         ];
         foreach ($variants as $variant) {

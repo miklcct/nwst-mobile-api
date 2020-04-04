@@ -22,7 +22,7 @@ class VariantListParser {
     public function __invoke(string $file) : array {
         return array_map(
             [$this, 'parseLine']
-            , array_filter(explode('||<br>', $file))
+            , array_filter(explode('<br>', $file))
         );
     }
 
@@ -31,6 +31,7 @@ class VariantListParser {
         $segments[0] = (int)$segments[0];
         $segments[2] = Rdv::parse($segments[2]);
         $segments[4] = VariantInfo::parse($segments[4], '***');
+        if ($segments[5] === '') $segments[6] = NULL;
         return new RouteVariant(...$segments);
     }
 }
