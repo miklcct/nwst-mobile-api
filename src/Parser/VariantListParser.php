@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Miklcct\Nwst\Parser;
 
+use Miklcct\Nwst\Model\Rdv;
 use Miklcct\Nwst\Model\Variant;
 use function array_filter;
 use function array_map;
@@ -27,6 +28,7 @@ class VariantListParser {
     protected function parseLine(string $line) : Variant {
         $segments = explode('||', $line);
         $segments[0] = (int)$segments[0];
+        $segments[2] = Rdv::parse($segments[2]);
         return new Variant(...$segments);
     }
 }

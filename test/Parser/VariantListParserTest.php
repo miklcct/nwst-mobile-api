@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Miklcct\Nwst\Test\Parser;
 
+use Miklcct\Nwst\Model\Rdv;
 use Miklcct\Nwst\Model\Variant;
 use Miklcct\Nwst\Parser\VariantListParser;
 use PHPUnit\Framework\TestCase;
@@ -16,14 +17,14 @@ class VariantListParserTest extends TestCase {
             new Variant(
                 1
                 , Variant::COLOUR_GREEN
-                , '14-MAH-2'
+                , new Rdv('14', 'MAH', 2)
                 , 'Departure via Stanley Village, Stanley Fort to Stanley Plaza'
                 , 'NWFB***14-MAH-2***1***30***10405***O'
             )
             , new Variant(
                 2
                 , Variant::COLOUR_RED
-                , '14-SFG-1'
+                , new Rdv('14', 'SFG', 1)
                 , 'Departure via Stanley Village to Stanley Fort'
                 , 'NWFB***14-SFG-1***1***24***10406***O'
             )

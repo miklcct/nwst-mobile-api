@@ -10,7 +10,7 @@ class Variant {
     public function __construct(
         int $serial
         , string $colour
-        , string $rdv
+        , Rdv $rdv
         , string $description
         , string $id
     ) {
@@ -30,7 +30,7 @@ class Variant {
      */
     public $colour;
     /**
-     * @var string RDV composed with the route, destination and serial, e.g. 14-MAH-2
+     * @var Rdv RDV composed with the route, destination and serial, e.g. 14-MAH-2
      */
     public $rdv;
     /**
