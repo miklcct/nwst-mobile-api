@@ -75,9 +75,9 @@ class Route {
     public $service_type;
     /** @var string|null jointly-operated company, e.g. KMB */
     public $joint_company;
-    /** @var string The initial stop sequence in the default variant */
+    /** @var int The initial stop sequence in the default variant */
     public $from_stop;
-    /** @var string The final stop sequence in the default variant */
+    /** @var int The final stop sequence in the default variant */
     public $to_stop;
     /** @var bool is the route a circular route split into 2 directions */
     public $is_split;
