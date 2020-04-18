@@ -45,6 +45,19 @@ class ApiTest extends TestCase {
         );
     }
 
+    public function testGetBaseUrl() : void {
+        $this->assertSame(self::BASE_URL, $this->iut->getBaseUrl());
+    }
+
+    public function testGetBaseUrlNotSpecifiedInConstructor() : void {
+        for ($i = 0; $i < 10; ++$i) {
+            $api = new Api($this->client, self::APPID, self::SYSCODE5, self::LANGUAGE);
+            for ($j = 0; $j < 10; ++$j) {
+                $this->assertContains($api->getBaseUrl(), Api::SERVERS);
+            }
+        }
+    }
+
     public function testGetRouteList() : void {
         $content = file_get_contents(__DIR__ . '/Parser/RouteList');
         $this->setRouteListApi(new FulfilledPromise(new Response(200, [], $content)));
