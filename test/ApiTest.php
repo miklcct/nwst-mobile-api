@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Miklcct\Nwst\Test;
 
+use Error;
 use Exception;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\FulfilledPromise;
@@ -13,7 +14,10 @@ use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\Psr7\UriNormalizer;
 use Miklcct\Nwst\Api;
 use Miklcct\Nwst\ApiException;
+use Miklcct\Nwst\Model\Rdv;
+use Miklcct\Nwst\Model\VariantInfo;
 use Miklcct\Nwst\Parser\RouteListParser;
+use Miklcct\Nwst\Parser\StopListParser;
 use Miklcct\Nwst\Parser\VariantListParser;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -115,6 +119,46 @@ class ApiTest extends TestCase {
         $this->iut->getVariantList($route_id)->wait();
     }
 
+    public function testGetStopList() : void {
+        $content = file_get_contents(__DIR__ . '/Parser/StopList');
+        $variant_info = new VariantInfo('CTB', new Rdv('118', 'TOS', 1), 1, 30, 10179, 'O');
+        $this->setStopListApi($variant_info, new FulfilledPromise(new Response(200, [], $content)));
+        $this->assertEquals(
+            (new StopListParser())($content)
+            , $this->iut->getStopList($variant_info)->wait()
+        );
+    }
+
+    public function testGetStopListFail() : void {
+        $original = new Error();
+        $variant_info = new VariantInfo('CTB', new Rdv('118', 'TOS', 2), 1, 30, 10180, 'O');
+        $this->setStopListApi($variant_info, new RejectedPromise($original));
+        $this->expectException(ApiException::class);
+        $this->expectExceptionCode(ApiException::HTTP_ERROR);
+        try {
+            $this->iut->getStopList($variant_info)->wait();
+        } catch (ApiException $e) {
+            self::assertSame($original, $e->getPrevious());
+            throw $e;
+        }
+    }
+
+    public function testGetStopEmpty() : void {
+        $variant_info = new VariantInfo('CTB', new Rdv('102', 'MEF', 1), 1, 15, 10262, 'O');
+        $this->setStopListApi($variant_info, new FulfilledPromise(new Response(200, [], '')));
+        $this->expectException(ApiException::class);
+        $this->expectExceptionCode(ApiException::EMPTY_BODY);
+        $this->iut->getStopList($variant_info)->wait();
+    }
+
+    public function testGetStopParseError() : void {
+        $variant_info = new VariantInfo('CTB', new Rdv('102', 'MEF', 1), 1, 15, 10262, 'O');
+        $this->setStopListApi($variant_info, new FulfilledPromise(new Response(200, [], 'ASF$@K#L$J@KLJASDFAFd')));
+        $this->expectException(ApiException::class);
+        $this->expectExceptionCode(ApiException::PARSE_ERROR);
+        $this->iut->getStopList($variant_info)->wait();
+    }
+
     private static function compareUri(UriInterface $expected_uri) : callable {
         return static function (UriInterface $actual_uri) use ($expected_uri) : bool {
             return UriNormalizer::isEquivalent($expected_uri, $actual_uri);
@@ -147,6 +191,27 @@ class ApiTest extends TestCase {
                             new Uri(self::BASE_URL . 'getvariantlist.php')
                             , [
                                 'id' => $route_id,
+                                'appid' => self::APPID,
+                                'syscode5' => self::SYSCODE5,
+                                'l' => self::LANGUAGE,
+                            ]
+                        )
+                    )
+                )
+            )
+            ->willReturn($result);
+    }
+
+    private function setStopListApi(VariantInfo $variant_info, PromiseInterface $result) : void {
+        $this->client->expects(self::once())->method('requestAsync')
+            ->with(
+                'GET'
+                , self::callback(
+                    self::compareUri(
+                        Uri::withQueryValues(
+                            new Uri(self::BASE_URL . 'ppstoplist.php')
+                            , [
+                                'info' => '0|*|' . $variant_info->toString('||'),
                                 'appid' => self::APPID,
                                 'syscode5' => self::SYSCODE5,
                                 'l' => self::LANGUAGE,

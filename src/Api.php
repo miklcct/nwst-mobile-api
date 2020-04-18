@@ -6,8 +6,10 @@ namespace Miklcct\Nwst;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Uri;
+use Miklcct\Nwst\Model\VariantInfo;
 use Miklcct\Nwst\Parser\ParserInterface;
 use Miklcct\Nwst\Parser\RouteListParser;
+use Miklcct\Nwst\Parser\StopListParser;
 use Miklcct\Nwst\Parser\VariantListParser;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
@@ -66,11 +68,19 @@ class Api {
         return $this->callApi($this->getUri('getvariantlist.php', ['id' => $route_id]), new VariantListParser());
     }
 
+    public function getStopList(VariantInfo $variant_info) : PromiseInterface {
+        return $this->callApi(
+            $this->getUri('ppstoplist.php', ['info' => '0|*|' . $variant_info->toString('||')])
+            , new StopListParser()
+        );
+    }
+
     public function getUri(string $endpoint, array $query = []) : UriInterface {
         $uri = new Uri($this->getBaseUrl());
         return Uri::withQueryValues(
             $uri->withPath($uri->getPath() . ltrim($endpoint, '/'))
-            , $query + ['appid' => $this->appid, 'syscode5' => $this->syscode5, 'l' => $this->language]
+            ,
+            $query + ['appid' => $this->appid, 'syscode5' => $this->syscode5, 'l' => $this->language]
         );
     }
 
