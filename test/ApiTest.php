@@ -14,9 +14,11 @@ use GuzzleHttp\Psr7\UriNormalizer;
 use Miklcct\Nwst\Api;
 use Miklcct\Nwst\ApiException;
 use Miklcct\Nwst\Parser\RouteListParser;
+use Miklcct\Nwst\Parser\VariantListParser;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface;
+use RuntimeException;
 use function file_get_contents;
 
 class ApiTest extends TestCase {
@@ -73,6 +75,46 @@ class ApiTest extends TestCase {
         $this->iut->getRouteList()->wait();
     }
 
+    public function testGetVariantList() : void {
+        $route_id = '14--Stanley_Fort_(Gate)_!_Ma_Hang';
+        $content = file_get_contents(__DIR__ . '/Parser/VariantList');
+        $this->setVariantListApi($route_id, new FulfilledPromise(new Response(200, [], $content)));
+        $this->assertEquals(
+            (new VariantListParser())($content)
+            , $this->iut->getVariantList($route_id)->wait()
+        );
+    }
+
+    public function testGetVariantListFail() : void {
+        $route_id = '14--Stanley_Fort_(Gate)_!_Ma_Hang';
+        $original = new RuntimeException();
+        $this->setVariantListApi($route_id, new RejectedPromise($original));
+        $this->expectException(ApiException::class);
+        $this->expectExceptionCode(ApiException::HTTP_ERROR);
+        try {
+            $this->iut->getVariantList($route_id)->wait();
+        } catch (ApiException $e) {
+            self::assertSame($original, $e->getPrevious());
+            throw $e;
+        }
+    }
+
+    public function testGetVariantEmpty() : void {
+        $route_id = '14--Stanley_Fort_(Gate)_!_Ma_Hang';
+        $this->setVariantListApi($route_id, new FulfilledPromise(new Response(200, [], '')));
+        $this->expectException(ApiException::class);
+        $this->expectExceptionCode(ApiException::EMPTY_BODY);
+        $this->iut->getVariantList($route_id)->wait();
+    }
+
+    public function testGetVariantParseError() : void {
+        $route_id = '14--Stanley_Fort_(Gate)_!_Ma_Hang';
+        $this->setVariantListApi($route_id, new FulfilledPromise(new Response(200, [], '@#$(*(!!@')));
+        $this->expectException(ApiException::class);
+        $this->expectExceptionCode(ApiException::PARSE_ERROR);
+        $this->iut->getVariantList($route_id)->wait();
+    }
+
     private static function compareUri(UriInterface $expected_uri) : callable {
         return static function (UriInterface $actual_uri) use ($expected_uri) : bool {
             return UriNormalizer::isEquivalent($expected_uri, $actual_uri);
@@ -88,6 +130,27 @@ class ApiTest extends TestCase {
                         Uri::withQueryValues(
                             new Uri(self::BASE_URL . 'getroutelist2.php')
                             , ['appid' => self::APPID, 'syscode5' => self::SYSCODE5, 'l' => self::LANGUAGE]
+                        )
+                    )
+                )
+            )
+            ->willReturn($result);
+    }
+
+    private function setVariantListApi(string $route_id, PromiseInterface $result) : void {
+        $this->client->expects(self::once())->method('requestAsync')
+            ->with(
+                'GET'
+                , self::callback(
+                    self::compareUri(
+                        Uri::withQueryValues(
+                            new Uri(self::BASE_URL . 'getvariantlist.php')
+                            , [
+                                'id' => $route_id,
+                                'appid' => self::APPID,
+                                'syscode5' => self::SYSCODE5,
+                                'l' => self::LANGUAGE,
+                            ]
                         )
                     )
                 )

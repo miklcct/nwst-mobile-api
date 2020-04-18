@@ -11,7 +11,7 @@ use function array_map;
 use function explode;
 use function Miklcct\Nwst\parse_int;
 
-class VariantListParser {
+class VariantListParser implements ParserInterface {
     /**
      * Parse the return from the variant list API
      *

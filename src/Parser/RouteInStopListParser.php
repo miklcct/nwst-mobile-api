@@ -13,7 +13,7 @@ use function explode;
 use function Miklcct\Nwst\parse_float;
 use function Miklcct\Nwst\parse_int;
 
-class RouteInStopListParser {
+class RouteInStopListParser implements ParserInterface {
     /**
      * Parse the return from the route in stop list API
      *

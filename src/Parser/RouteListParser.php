@@ -8,7 +8,7 @@ use function explode;
 use function Miklcct\Nwst\parse_int;
 use function Miklcct\Nwst\parse_yes_no;
 
-class RouteListParser {
+class RouteListParser implements ParserInterface {
     /**
      * Parse the return from the route list API
      *

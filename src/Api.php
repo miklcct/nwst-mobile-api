@@ -6,7 +6,9 @@ namespace Miklcct\Nwst;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Uri;
+use Miklcct\Nwst\Parser\ParserInterface;
 use Miklcct\Nwst\Parser\RouteListParser;
+use Miklcct\Nwst\Parser\VariantListParser;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Throwable;
@@ -49,18 +51,19 @@ class Api {
      * Get the route list
      *
      * @return PromiseInterface
-     * @throws ApiException
      */
     public function getRouteList() : PromiseInterface {
-        return $this->callApi($this->getUri('getroutelist2.php'))->then(
-            static function (ResponseInterface $response) {
-                try {
-                    return (new RouteListParser())($response->getBody()->__toString());
-                } catch (Throwable $e) {
-                    throw new ApiException('Failed to parse route list.', ApiException::PARSE_ERROR, $e);
-                }
-            }
-        );
+        return $this->callApi($this->getUri('getroutelist2.php'), new RouteListParser());
+    }
+
+    /**
+     * Get the variant list
+     *
+     * @param string $route_id e.g. '1--Felix_Villas'
+     * @return PromiseInterface
+     */
+    public function getVariantList(string $route_id) : PromiseInterface {
+        return $this->callApi($this->getUri('getvariantlist.php', ['id' => $route_id]), new VariantListParser());
     }
 
     public function getUri(string $endpoint, array $query = []) : UriInterface {
@@ -71,13 +74,18 @@ class Api {
         );
     }
 
-    private function callApi(UriInterface $uri) : PromiseInterface {
+    private function callApi(UriInterface $uri, ParserInterface $parser) : PromiseInterface {
         return $this->client->requestAsync('GET', $uri)->then(
-            function (ResponseInterface $response) {
-                if ($response->getBody()->getSize() === 0) {
+            function (ResponseInterface $response) use ($parser) {
+                $body = $response->getBody();
+                if ($body->getSize() === 0) {
                     throw new ApiException('The API returns an empty response.', ApiException::EMPTY_BODY);
                 }
-                return $response;
+                try {
+                    return $parser($body->__toString());
+                } catch (Throwable $e) {
+                    throw new ApiException('Failed to parse the API result.', ApiException::PARSE_ERROR, $e);
+                }
             }
             , function (Throwable $exception) {
                 throw new ApiException('The API call failed', ApiException::HTTP_ERROR, $exception);

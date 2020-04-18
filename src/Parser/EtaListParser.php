@@ -14,7 +14,7 @@ use function Miklcct\Nwst\nullif;
 use function Miklcct\Nwst\parse_int;
 use function Miklcct\Nwst\parse_yes_no;
 
-class EtaListParser {
+class EtaListParser implements ParserInterface {
     /**
      * Parse the return from the ETA API
      *
