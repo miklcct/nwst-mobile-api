@@ -17,7 +17,7 @@ class ApiFactory {
 
     public function __invoke(int $language = Api::TRADITIONAL_CHINESE, ?string $appid = NULL, ?string $syscode5 = NULL) {
         $secret = NULL;
-        if ($appid !== NULL || $syscode5 !== NULL) {
+        if ($appid === NULL || $syscode5 === NULL) {
             $secret = $this->getSecret();
         }
         return new Api($this->client, $appid ?? $secret->appid, $syscode5 ?? $secret->syscode5, $language);
