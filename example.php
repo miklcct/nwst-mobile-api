@@ -11,7 +11,7 @@ use Miklcct\Nwst\Model\Rdv;
 require __DIR__ . '/vendor/autoload.php';
 
 $api = (new ApiFactory(new Client()))();
-$result = $api->getEtaList('970', 1, 2392, Rdv::parse('970-SOU-1'))->wait();
+$result = $api->getEtaList('970', 1, 2392, Rdv::parse('970-SOU-1'), 'O')->wait();
 
 if ($result instanceof NoEta) {
     echo $result->format === 'HTML' ? strip_tags($result->content) : $result->content;

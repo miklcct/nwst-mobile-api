@@ -219,12 +219,13 @@ class ApiTest extends TestCase {
         $route_number = '118';
         $sequence = 13;
         $stop_id = 1231;
+        $bound = 'O';
         $rdv = new Rdv('118', 'TOS', 1);
         $content = file_get_contents(__DIR__ . '/Parser/EtaList');
-        $this->setEtaListApi($route_number, $sequence, $stop_id, $rdv, new FulfilledPromise(new Response(200, [], $content)));
+        $this->setEtaListApi($route_number, $sequence, $stop_id, $rdv, $bound, new FulfilledPromise(new Response(200, [], $content)));
         $this->assertEquals(
             (new EtaListParser())($content)
-            , $this->iut->getEtaList($route_number, $sequence, $stop_id, $rdv)->wait()
+            , $this->iut->getEtaList($route_number, $sequence, $stop_id, $rdv, $bound)->wait()
         );
     }
 
@@ -233,12 +234,13 @@ class ApiTest extends TestCase {
         $sequence = 13;
         $stop_id = 1231;
         $rdv = new Rdv('118', 'TOS', 1);
+        $bound = 'O';
         $original = new Exception();
-        $this->setEtaListApi($route_number, $sequence, $stop_id, $rdv, new RejectedPromise($original));
+        $this->setEtaListApi($route_number, $sequence, $stop_id, $rdv, $bound, new RejectedPromise($original));
         $this->expectException(ApiException::class);
         $this->expectExceptionCode(ApiException::HTTP_ERROR);
         try {
-            $this->iut->getEtaList($route_number, $sequence, $stop_id, $rdv)->wait();
+            $this->iut->getEtaList($route_number, $sequence, $stop_id, $rdv, $bound)->wait();
         } catch (ApiException $exception) {
             self::assertSame($original, $exception->getPrevious());
             throw $exception;
@@ -250,10 +252,11 @@ class ApiTest extends TestCase {
         $sequence = 13;
         $stop_id = 1231;
         $rdv = new Rdv('118', 'TOS', 1);
-        $this->setEtaListApi($route_number, $sequence, $stop_id, $rdv, new FulfilledPromise(new Response(200, [], '')));
+        $bound = 'O';
+        $this->setEtaListApi($route_number, $sequence, $stop_id, $rdv, $bound, new FulfilledPromise(new Response(200, [], '')));
         $this->expectException(ApiException::class);
         $this->expectExceptionCode(ApiException::EMPTY_BODY);
-        $this->iut->getEtaList($route_number, $sequence, $stop_id, $rdv)->wait();
+        $this->iut->getEtaList($route_number, $sequence, $stop_id, $rdv, $bound)->wait();
     }
 
     public function testGetEtaParseError() : void {
@@ -261,10 +264,11 @@ class ApiTest extends TestCase {
         $sequence = 13;
         $stop_id = 1231;
         $rdv = new Rdv('118', 'TOS', 1);
-        $this->setEtaListApi($route_number, $sequence, $stop_id, $rdv, new FulfilledPromise(new Response(200, [], 'FUCK YOU')));
+        $bound = 'O';
+        $this->setEtaListApi($route_number, $sequence, $stop_id, $rdv, $bound, new FulfilledPromise(new Response(200, [], 'FUCK YOU')));
         $this->expectException(ApiException::class);
         $this->expectExceptionCode(ApiException::PARSE_ERROR);
-        $this->iut->getEtaList($route_number, $sequence, $stop_id, $rdv)->wait();
+        $this->iut->getEtaList($route_number, $sequence, $stop_id, $rdv, $bound)->wait();
     }
 
     private static function compareUri(UriInterface $expected_uri) : callable {
@@ -346,6 +350,7 @@ class ApiTest extends TestCase {
         , int $sequence
         , int $stop_id
         , Rdv $rdv
+        , string $bound
         , PromiseInterface $result
     ) : void {
         $this->client->expects(self::once())->method('requestAsync')
@@ -360,6 +365,7 @@ class ApiTest extends TestCase {
                                 'stopseq' => $sequence,
                                 'stopid' => $stop_id,
                                 'rdv' => $rdv->__toString(),
+                                'bound' => $bound,
                                 'mode' => '3eta',
                             ] + $this->getBaseQueryParameters()
                         )

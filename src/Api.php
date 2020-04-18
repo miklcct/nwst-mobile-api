@@ -87,7 +87,7 @@ class Api {
         );
     }
 
-    public function getEtaList(string $route_number, int $sequence, int $stop_id, Rdv $rdv) : PromiseInterface {
+    public function getEtaList(string $route_number, int $sequence, int $stop_id, Rdv $rdv, string $bound) : PromiseInterface {
         return $this->callApi(
             $this->getUri(
                 'getEta.php'
@@ -97,6 +97,7 @@ class Api {
                     'stopseq' => $sequence,
                     'stopid' => $stop_id,
                     'rdv' => $rdv->__toString(),
+                    'bound' => $bound,
                 ]
             )
             , new EtaListParser()
