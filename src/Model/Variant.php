@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Miklcct\Nwst\Model;
 
-class RouteVariant {
+class Variant {
     public const COLOUR_RED = 'R';
     public const COLOUR_GREEN = 'G';
 
@@ -19,7 +19,7 @@ class RouteVariant {
         $this->colour = $colour;
         $this->rdv = $rdv;
         $this->description = $description;
-        $this->id = $variantInfo;
+        $this->info = $variantInfo;
         $this->jointCompany = $jointCompany;
     }
 
@@ -42,7 +42,7 @@ class RouteVariant {
     /**
      * @var VariantInfo A unique identifier used for querying the API, such as NWFB***14-MAH-2***1***30***10405***O
      */
-    public $id;
+    public $info;
     /**
      * @var string|null
      */

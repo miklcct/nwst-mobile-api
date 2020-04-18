@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Miklcct\Nwst\Parser;
 
 use Miklcct\Nwst\Model\Rdv;
-use Miklcct\Nwst\Model\RouteVariant;
+use Miklcct\Nwst\Model\Variant;
 use Miklcct\Nwst\Model\VariantInfo;
 use function array_filter;
 use function array_map;
@@ -18,7 +18,7 @@ class VariantListParser implements ParserInterface {
      * For the expected format, check the test sources
      *
      * @param string $file
-     * @return RouteVariant[]
+     * @return Variant[]
      */
     public function __invoke(string $file) : array {
         return array_map(
@@ -27,12 +27,12 @@ class VariantListParser implements ParserInterface {
         );
     }
 
-    protected function parseLine(string $line) : RouteVariant {
+    protected function parseLine(string $line) : Variant {
         $segments = explode('||', $line);
         $segments[0] = parse_int($segments[0]);
         $segments[2] = Rdv::parse($segments[2]);
         $segments[4] = VariantInfo::parse($segments[4], '***');
         if ($segments[5] === '') $segments[5] = NULL;
-        return new RouteVariant(...$segments);
+        return new Variant(...$segments);
     }
 }

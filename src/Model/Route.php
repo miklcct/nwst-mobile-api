@@ -22,8 +22,8 @@ class Route {
         , string $routeNumber
         , string $destinationCode
         , int $numberOfWays
-        , string $from
-        , string $to
+        , string $origin
+        , string $destinatio0n
         , int $brand
         , string $id
         , int $defaultVariant
@@ -38,8 +38,8 @@ class Route {
         $this->routeNumber = $routeNumber;
         $this->destinationCode = $destinationCode;
         $this->numberOfWays = $numberOfWays;
-        $this->from = $from;
-        $this->to = $to;
+        $this->origin = $origin;
+        $this->destination = $destinatio0n;
         $this->brand = $brand;
         $this->id = $id;
         $this->defaultVariant = $defaultVariant;
@@ -60,9 +60,9 @@ class Route {
     /** @var int 0 for circular, 1 for one way, 2 for two ways */
     public $numberOfWays;
     /** @var string The departing place */
-    public $from;
+    public $origin;
     /** @var string The arriving place */
-    public $to;
+    public $destination;
     /** @var int The brand the route belongs to */
     public $brand;
     /** @var string The identifier for querying the API, normally in the form like 4X--Wah_Fu_(South) */

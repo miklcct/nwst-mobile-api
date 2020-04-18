@@ -6,7 +6,13 @@ namespace Miklcct\Nwst;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Uri;
+use Miklcct\Nwst\Model\Eta;
+use Miklcct\Nwst\Model\NoEta;
 use Miklcct\Nwst\Model\Rdv;
+use Miklcct\Nwst\Model\Route;
+use Miklcct\Nwst\Model\RouteStop;
+use Miklcct\Nwst\Model\StopInfo;
+use Miklcct\Nwst\Model\Variant;
 use Miklcct\Nwst\Model\VariantInfo;
 use Miklcct\Nwst\Parser\EtaListParser;
 use Miklcct\Nwst\Parser\ParserInterface;
@@ -55,7 +61,7 @@ class Api {
     /**
      * Get the route list
      *
-     * @return PromiseInterface
+     * @return PromiseInterface|PromiseInterface<Route[]>
      */
     public function getRouteList() : PromiseInterface {
         return $this->callApi($this->getUri('getroutelist2.php'), new RouteListParser());
@@ -65,12 +71,18 @@ class Api {
      * Get the variant list
      *
      * @param string $route_id e.g. '1--Felix_Villas'
-     * @return PromiseInterface
+     * @return PromiseInterface|PromiseInterface<Variant[]>
      */
     public function getVariantList(string $route_id) : PromiseInterface {
         return $this->callApi($this->getUri('getvariantlist.php', ['id' => $route_id]), new VariantListParser());
     }
 
+    /**
+     * Get the stop list of a variant
+     *
+     * @param VariantInfo $variant_info
+     * @return PromiseInterface|PromiseInterface<RouteStop[]>
+     */
     public function getStopList(VariantInfo $variant_info) : PromiseInterface {
         return $this->callApi(
             $this->getUri('ppstoplist.php', ['info' => '0|*|' . $variant_info->toString('||')])
@@ -79,6 +91,12 @@ class Api {
         );
     }
 
+    /**
+     * Get the stop information with routes serving the stop
+     *
+     * @param int $stop_id
+     * @return PromiseInterface|PromiseInterface<StopInfo>
+     */
     public function getRouteInStopList(int $stop_id) : PromiseInterface {
         return $this->callApi(
             $this->getUri('getrouteinstop_eta_extra.php', ['id' => $stop_id])
@@ -87,6 +105,16 @@ class Api {
         );
     }
 
+    /**
+     * Get ETAs
+     *
+     * @param string $route_number The route number, e.g. "970X"
+     * @param int $sequence The stop sequence inside the RDV
+     * @param int $stop_id The stop id to be queried, must match the stop sequence above
+     * @param Rdv $rdv
+     * @param string $bound 'I' for inbound, 'O' for outbound, must match the RDV
+     * @return PromiseInterface|PromiseInterface<Eta[]|NoEta>
+     */
     public function getEtaList(string $route_number, int $sequence, int $stop_id, Rdv $rdv, string $bound) : PromiseInterface {
         return $this->callApi(
             $this->getUri(
