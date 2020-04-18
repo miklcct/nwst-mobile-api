@@ -6,7 +6,9 @@ namespace Miklcct\Nwst;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Uri;
+use Miklcct\Nwst\Model\Rdv;
 use Miklcct\Nwst\Model\VariantInfo;
+use Miklcct\Nwst\Parser\EtaListParser;
 use Miklcct\Nwst\Parser\ParserInterface;
 use Miklcct\Nwst\Parser\RouteInStopListParser;
 use Miklcct\Nwst\Parser\RouteListParser;
@@ -72,14 +74,32 @@ class Api {
     public function getStopList(VariantInfo $variant_info) : PromiseInterface {
         return $this->callApi(
             $this->getUri('ppstoplist.php', ['info' => '0|*|' . $variant_info->toString('||')])
-            , new StopListParser()
+            ,
+            new StopListParser()
         );
     }
 
     public function getRouteInStopList(int $stop_id) : PromiseInterface {
         return $this->callApi(
             $this->getUri('getrouteinstop_eta_extra.php', ['id' => $stop_id])
-            , new RouteInStopListParser()
+            ,
+            new RouteInStopListParser()
+        );
+    }
+
+    public function getEtaList(string $route_number, int $sequence, int $stop_id, Rdv $rdv) : PromiseInterface {
+        return $this->callApi(
+            $this->getUri(
+                'getEta.php'
+                , [
+                    'mode' => '3eta',
+                    'service_no' => $route_number,
+                    'stopseq' => $sequence,
+                    'stopid' => $stop_id,
+                    'rdv' => $rdv->__toString(),
+                ]
+            )
+            , new EtaListParser()
         );
     }
 

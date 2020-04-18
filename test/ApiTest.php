@@ -17,6 +17,7 @@ use Miklcct\Nwst\Api;
 use Miklcct\Nwst\ApiException;
 use Miklcct\Nwst\Model\Rdv;
 use Miklcct\Nwst\Model\VariantInfo;
+use Miklcct\Nwst\Parser\EtaListParser;
 use Miklcct\Nwst\Parser\RouteInStopListParser;
 use Miklcct\Nwst\Parser\RouteListParser;
 use Miklcct\Nwst\Parser\StopListParser;
@@ -214,9 +215,65 @@ class ApiTest extends TestCase {
         $this->iut->getRouteInStopList($stop)->wait();
     }
 
+    public function testGetEtaList() : void {
+        $route_number = '118';
+        $sequence = 13;
+        $stop_id = 1231;
+        $rdv = new Rdv('118', 'TOS', 1);
+        $content = file_get_contents(__DIR__ . '/Parser/EtaList');
+        $this->setEtaListApi($route_number, $sequence, $stop_id, $rdv, new FulfilledPromise(new Response(200, [], $content)));
+        $this->assertEquals(
+            (new EtaListParser())($content)
+            , $this->iut->getEtaList($route_number, $sequence, $stop_id, $rdv)->wait()
+        );
+    }
+
+    public function testGetEtaFail() : void {
+        $route_number = '118';
+        $sequence = 13;
+        $stop_id = 1231;
+        $rdv = new Rdv('118', 'TOS', 1);
+        $original = new Exception();
+        $this->setEtaListApi($route_number, $sequence, $stop_id, $rdv, new RejectedPromise($original));
+        $this->expectException(ApiException::class);
+        $this->expectExceptionCode(ApiException::HTTP_ERROR);
+        try {
+            $this->iut->getEtaList($route_number, $sequence, $stop_id, $rdv)->wait();
+        } catch (ApiException $exception) {
+            self::assertSame($original, $exception->getPrevious());
+            throw $exception;
+        }
+    }
+
+    public function testGetEtaEmpty() : void {
+        $route_number = '118';
+        $sequence = 13;
+        $stop_id = 1231;
+        $rdv = new Rdv('118', 'TOS', 1);
+        $this->setEtaListApi($route_number, $sequence, $stop_id, $rdv, new FulfilledPromise(new Response(200, [], '')));
+        $this->expectException(ApiException::class);
+        $this->expectExceptionCode(ApiException::EMPTY_BODY);
+        $this->iut->getEtaList($route_number, $sequence, $stop_id, $rdv)->wait();
+    }
+
+    public function testGetEtaParseError() : void {
+        $route_number = '118';
+        $sequence = 13;
+        $stop_id = 1231;
+        $rdv = new Rdv('118', 'TOS', 1);
+        $this->setEtaListApi($route_number, $sequence, $stop_id, $rdv, new FulfilledPromise(new Response(200, [], 'FUCK YOU')));
+        $this->expectException(ApiException::class);
+        $this->expectExceptionCode(ApiException::PARSE_ERROR);
+        $this->iut->getEtaList($route_number, $sequence, $stop_id, $rdv)->wait();
+    }
+
     private static function compareUri(UriInterface $expected_uri) : callable {
         return static function (UriInterface $actual_uri) use ($expected_uri) : bool {
-            return UriNormalizer::isEquivalent($expected_uri, $actual_uri);
+            return UriNormalizer::isEquivalent(
+                $expected_uri
+                , $actual_uri
+                , UriNormalizer::PRESERVING_NORMALIZATIONS | UriNormalizer::SORT_QUERY_PARAMETERS
+            );
         };
     }
 
@@ -228,7 +285,7 @@ class ApiTest extends TestCase {
                     self::compareUri(
                         Uri::withQueryValues(
                             new Uri(self::BASE_URL . 'getroutelist2.php')
-                            , ['appid' => self::APPID, 'syscode5' => self::SYSCODE5, 'l' => self::LANGUAGE]
+                            , $this->getBaseQueryParameters()
                         )
                     )
                 )
@@ -244,12 +301,7 @@ class ApiTest extends TestCase {
                     self::compareUri(
                         Uri::withQueryValues(
                             new Uri(self::BASE_URL . 'getvariantlist.php')
-                            , [
-                                'id' => $route_id,
-                                'appid' => self::APPID,
-                                'syscode5' => self::SYSCODE5,
-                                'l' => self::LANGUAGE,
-                            ]
+                            , ['id' => $route_id] + $this->getBaseQueryParameters()
                         )
                     )
                 )
@@ -265,12 +317,7 @@ class ApiTest extends TestCase {
                     self::compareUri(
                         Uri::withQueryValues(
                             new Uri(self::BASE_URL . 'ppstoplist.php')
-                            , [
-                                'info' => '0|*|' . $variant_info->toString('||'),
-                                'appid' => self::APPID,
-                                'syscode5' => self::SYSCODE5,
-                                'l' => self::LANGUAGE,
-                            ]
+                            , ['info' => '0|*|' . $variant_info->toString('||')] + $this->getBaseQueryParameters()
                         )
                     )
                 )
@@ -286,17 +333,48 @@ class ApiTest extends TestCase {
                     self::compareUri(
                         Uri::withQueryValues(
                             new Uri(self::BASE_URL . 'getrouteinstop_eta_extra.php')
-                            , [
-                                'id' => $stop_id,
-                                'appid' => self::APPID,
-                                'syscode5' => self::SYSCODE5,
-                                'l' => self::LANGUAGE,
-                            ]
+                            , ['id' => $stop_id] + $this->getBaseQueryParameters()
                         )
                     )
                 )
             )
             ->willReturn($result);
+    }
+
+    private function setEtaListApi(
+        string $route_number
+        , int $sequence
+        , int $stop_id
+        , Rdv $rdv
+        , PromiseInterface $result
+    ) : void {
+        $this->client->expects(self::once())->method('requestAsync')
+            ->with(
+                'GET'
+                , self::callback(
+                    self::compareUri(
+                        Uri::withQueryValues(
+                            new Uri(self::BASE_URL . 'getEta.php')
+                            , [
+                                'service_no' => $route_number,
+                                'stopseq' => $sequence,
+                                'stopid' => $stop_id,
+                                'rdv' => $rdv->__toString(),
+                                'mode' => '3eta',
+                            ] + $this->getBaseQueryParameters()
+                        )
+                    )
+                )
+            )
+            ->willReturn($result);
+    }
+
+    private function getBaseQueryParameters() : array {
+        return [
+            'appid' => self::APPID,
+            'syscode5' => self::SYSCODE5,
+            'l' => self::LANGUAGE,
+        ];
     }
 
     /**
