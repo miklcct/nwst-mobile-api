@@ -9,7 +9,7 @@ class RouteInStop {
 
     public function __construct(
         string $company
-        , string $number
+        , string $routeNumber
         , string $destination
         , float $adultFare
         , int $numberOfWays
@@ -28,7 +28,7 @@ class RouteInStop {
         , int $variantSerial
     ) {
         $this->company = $company;
-        $this->number = $number;
+        $this->routeNumber = $routeNumber;
         $this->destination = $destination;
         $this->adultFare = $adultFare;
         $this->numberOfWays = $numberOfWays;
@@ -54,7 +54,7 @@ class RouteInStop {
     /**
      * @var string
      */
-    public $number;
+    public $routeNumber;
     /**
      * @var string
      */

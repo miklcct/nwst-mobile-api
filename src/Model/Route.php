@@ -19,7 +19,7 @@ class Route {
 
     public function __construct(
         string $company
-        , string $number
+        , string $routeNumber
         , string $destinationCode
         , int $numberOfWays
         , string $from
@@ -35,7 +35,7 @@ class Route {
         , bool $isSplit
     ) {
         $this->company = $company;
-        $this->number = $number;
+        $this->routeNumber = $routeNumber;
         $this->destinationCode = $destinationCode;
         $this->numberOfWays = $numberOfWays;
         $this->from = $from;
@@ -54,7 +54,7 @@ class Route {
     /** @var string CTB or NWFB */
     public $company;
     /** @var string e.g. 1P, 970 */
-    public $number;
+    public $routeNumber;
     /** @var string 3-letter code */
     public $destinationCode;
     /** @var int 0 for circular, 1 for one way, 2 for two ways */
