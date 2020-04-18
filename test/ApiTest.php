@@ -12,10 +12,12 @@ use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\Psr7\UriNormalizer;
+use LogicException;
 use Miklcct\Nwst\Api;
 use Miklcct\Nwst\ApiException;
 use Miklcct\Nwst\Model\Rdv;
 use Miklcct\Nwst\Model\VariantInfo;
+use Miklcct\Nwst\Parser\RouteInStopListParser;
 use Miklcct\Nwst\Parser\RouteListParser;
 use Miklcct\Nwst\Parser\StopListParser;
 use Miklcct\Nwst\Parser\VariantListParser;
@@ -159,6 +161,46 @@ class ApiTest extends TestCase {
         $this->iut->getStopList($variant_info)->wait();
     }
 
+    public function testGetRouteInStopList() : void {
+        $stop = 1003;
+        $content = file_get_contents(__DIR__ . '/Parser/RouteInStopList');
+        $this->setRouteInStopListApi($stop, new FulfilledPromise(new Response(200, [], $content)));
+        $this->assertEquals(
+            (new RouteInStopListParser())($content)
+            , $this->iut->getRouteInStopList($stop)->wait()
+        );
+    }
+
+    public function testGetRouteInStopListFail() : void {
+        $stop = 978;
+        $original = new LogicException();
+        $this->setRouteInStopListApi($stop, new RejectedPromise($original));
+        $this->expectException(ApiException::class);
+        $this->expectExceptionCode(ApiException::HTTP_ERROR);
+        try {
+            $this->iut->getRouteInStopList($stop)->wait();
+        } catch (ApiException $e) {
+            self::assertSame($original, $e->getPrevious());
+            throw $e;
+        }
+    }
+
+    public function testGetRouteInStopEmpty() : void {
+        $stop = 9999;
+        $this->setRouteInStopListApi($stop, new FulfilledPromise(new Response(200, [], '')));
+        $this->expectException(ApiException::class);
+        $this->expectExceptionCode(ApiException::EMPTY_BODY);
+        $this->iut->getRouteInStopList($stop)->wait();
+    }
+
+    public function testGetRouteInStopParseError() : void {
+        $stop = 9999;
+        $this->setRouteInStopListApi($stop, new FulfilledPromise(new Response(200, [], 'garbage')));
+        $this->expectException(ApiException::class);
+        $this->expectExceptionCode(ApiException::PARSE_ERROR);
+        $this->iut->getRouteInStopList($stop)->wait();
+    }
+
     private static function compareUri(UriInterface $expected_uri) : callable {
         return static function (UriInterface $actual_uri) use ($expected_uri) : bool {
             return UriNormalizer::isEquivalent($expected_uri, $actual_uri);
@@ -212,6 +254,27 @@ class ApiTest extends TestCase {
                             new Uri(self::BASE_URL . 'ppstoplist.php')
                             , [
                                 'info' => '0|*|' . $variant_info->toString('||'),
+                                'appid' => self::APPID,
+                                'syscode5' => self::SYSCODE5,
+                                'l' => self::LANGUAGE,
+                            ]
+                        )
+                    )
+                )
+            )
+            ->willReturn($result);
+    }
+
+    private function setRouteInStopListApi(int $stop_id, PromiseInterface $result) : void {
+        $this->client->expects(self::once())->method('requestAsync')
+            ->with(
+                'GET'
+                , self::callback(
+                    self::compareUri(
+                        Uri::withQueryValues(
+                            new Uri(self::BASE_URL . 'getrouteinstop_eta_extra.php')
+                            , [
+                                'id' => $stop_id,
                                 'appid' => self::APPID,
                                 'syscode5' => self::SYSCODE5,
                                 'l' => self::LANGUAGE,

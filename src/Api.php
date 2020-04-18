@@ -8,6 +8,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Uri;
 use Miklcct\Nwst\Model\VariantInfo;
 use Miklcct\Nwst\Parser\ParserInterface;
+use Miklcct\Nwst\Parser\RouteInStopListParser;
 use Miklcct\Nwst\Parser\RouteListParser;
 use Miklcct\Nwst\Parser\StopListParser;
 use Miklcct\Nwst\Parser\VariantListParser;
@@ -72,6 +73,13 @@ class Api {
         return $this->callApi(
             $this->getUri('ppstoplist.php', ['info' => '0|*|' . $variant_info->toString('||')])
             , new StopListParser()
+        );
+    }
+
+    public function getRouteInStopList(int $stop_id) : PromiseInterface {
+        return $this->callApi(
+            $this->getUri('getrouteinstop_eta_extra.php', ['id' => $stop_id])
+            , new RouteInStopListParser()
         );
     }
 
