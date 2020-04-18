@@ -36,3 +36,14 @@ function parse_yes_no(string $string) : bool {
         throw new InvalidArgumentException("$string is not a valid yes/no option.");
     }
 }
+
+/**
+ * Return NULL if $test is the same as $compare, otherwise $test
+ *
+ * @param mixed $test
+ * @param mixed $compare
+ * @return mixed
+ */
+function nullif($test, $compare) {
+    return $test === $compare ? NULL : $test;
+}
