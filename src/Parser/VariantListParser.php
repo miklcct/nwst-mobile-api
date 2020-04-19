@@ -9,6 +9,7 @@ use Miklcct\Nwst\Model\VariantInfo;
 use function array_filter;
 use function array_map;
 use function explode;
+use function Miklcct\Nwst\enable_error_exceptions;
 use function Miklcct\Nwst\parse_int;
 
 class VariantListParser implements ParserInterface {
@@ -21,9 +22,13 @@ class VariantListParser implements ParserInterface {
      * @return Variant[]
      */
     public function __invoke(string $file) : array {
-        return array_map(
-            [$this, 'parseLine']
-            , array_filter(explode('<br>', $file))
+        return enable_error_exceptions(
+            function () use ($file) {
+                return array_map(
+                    [$this, 'parseLine']
+                    , array_filter(explode('<br>', $file))
+                );
+            }
         );
     }
 

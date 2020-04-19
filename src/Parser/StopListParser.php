@@ -8,6 +8,7 @@ use Miklcct\Nwst\Model\RouteStop;
 use function array_filter;
 use function array_map;
 use function explode;
+use function Miklcct\Nwst\enable_error_exceptions;
 use function Miklcct\Nwst\parse_float;
 use function Miklcct\Nwst\parse_int;
 
@@ -21,9 +22,13 @@ class StopListParser implements ParserInterface {
      * @return RouteStop[]
      */
     public function __invoke(string $file) : array {
-        return array_map(
-            [$this, 'parseLine']
-            , array_filter(explode('<br>', $file))
+        return enable_error_exceptions(
+            function () use ($file) {
+                return array_map(
+                    [$this, 'parseLine']
+                    , array_filter(explode('<br>', $file))
+                );
+            }
         );
     }
 

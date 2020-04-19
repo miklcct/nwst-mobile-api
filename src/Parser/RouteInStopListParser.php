@@ -10,6 +10,7 @@ use Miklcct\Nwst\Model\StopInfo;
 use function array_filter;
 use function array_slice;
 use function explode;
+use function Miklcct\Nwst\enable_error_exceptions;
 use function Miklcct\Nwst\parse_float;
 use function Miklcct\Nwst\parse_int;
 
@@ -23,24 +24,28 @@ class RouteInStopListParser implements ParserInterface {
      * @return Route[]
      */
     public function __invoke(string $file) : StopInfo {
-        $lines = array_filter(explode('|*|<br>', $file));
-        $in_service = [];
-        $not_in_service = [];
-        $split = FALSE;
-        $first_line_items = explode('||', $lines[0]);
-        foreach (array_slice($lines, 1) as $line) {
-            if (explode('||', $line)[0] === 'NN') {
-                $split = TRUE;
-            } else {
-                $object = $this->parseLine($line);
-                if ($split) {
-                    $not_in_service[] = $object;
-                } else {
-                    $in_service[] = $object;
+        return enable_error_exceptions(
+            function () use ($file) {
+                $lines = array_filter(explode('|*|<br>', $file));
+                $in_service = [];
+                $not_in_service = [];
+                $split = FALSE;
+                $first_line_items = explode('||', $lines[0]);
+                foreach (array_slice($lines, 1) as $line) {
+                    if (explode('||', $line)[0] === 'NN') {
+                        $split = TRUE;
+                    } else {
+                        $object = $this->parseLine($line);
+                        if ($split) {
+                            $not_in_service[] = $object;
+                        } else {
+                            $in_service[] = $object;
+                        }
+                    }
                 }
+                return new StopInfo($first_line_items[0], $first_line_items[1], $in_service, $not_in_service);
             }
-        }
-        return new StopInfo($first_line_items[0], $first_line_items[1], $in_service, $not_in_service);
+        );
     }
 
     protected function parseLine(string $line) : RouteInStop {

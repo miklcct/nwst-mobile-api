@@ -5,6 +5,7 @@ namespace Miklcct\Nwst\Parser;
 
 use Miklcct\Nwst\Model\Route;
 use function explode;
+use function Miklcct\Nwst\enable_error_exceptions;
 use function Miklcct\Nwst\parse_int;
 use function Miklcct\Nwst\parse_yes_no;
 
@@ -18,9 +19,13 @@ class RouteListParser implements ParserInterface {
      * @return Route[]
      */
     public function __invoke(string $file) : array {
-        return array_map(
-            [$this, 'parseLine']
-            , array_filter(explode('|*|<br>', $file))
+        return enable_error_exceptions(
+            function () use ($file) {
+                return array_map(
+                    [$this, 'parseLine']
+                    , array_filter(explode('|*|<br>', $file))
+                );
+            }
         );
     }
 

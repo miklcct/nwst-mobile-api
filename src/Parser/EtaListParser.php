@@ -10,6 +10,7 @@ use Miklcct\Nwst\Model\Rdv;
 use function array_filter;
 use function array_map;
 use function explode;
+use function Miklcct\Nwst\enable_error_exceptions;
 use function Miklcct\Nwst\nullif;
 use function Miklcct\Nwst\parse_int;
 use function Miklcct\Nwst\parse_yes_no;
@@ -24,13 +25,17 @@ class EtaListParser implements ParserInterface {
      * @return Eta[]|NoEta
      */
     public function __invoke(string $file) {
-        $lines = array_filter(explode('|**|<br>', $file));
-        $first_line = explode('||', $lines[0]);
-        if ($first_line[0] !== '') {
-            $subsegments = explode('|##|', $first_line[0]);
-            return new NoEta($subsegments[1], $first_line[1]);
-        }
-        return array_map([$this, 'parseLine'], $lines);
+        return enable_error_exceptions(
+            function () use ($file) {
+                $lines = array_filter(explode('|**|<br>', $file));
+                $first_line = explode('||', $lines[0]);
+                if ($first_line[0] !== '') {
+                    $subsegments = explode('|##|', $first_line[0]);
+                    return new NoEta($subsegments[1], $first_line[1]);
+                }
+                return array_map([$this, 'parseLine'], $lines);
+            }
+        );
     }
 
     protected function parseLine(string $line) : Eta {

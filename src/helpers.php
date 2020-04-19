@@ -3,9 +3,13 @@ declare(strict_types=1);
 
 namespace Miklcct\Nwst;
 
+use ErrorException;
 use InvalidArgumentException;
+use function error_reporting;
 use function filter_var;
 use function ltrim;
+use function set_error_handler;
+use const E_ALL;
 use const FILTER_VALIDATE_FLOAT;
 use const FILTER_VALIDATE_INT;
 
@@ -46,4 +50,21 @@ function parse_yes_no(string $string) : bool {
  */
 function nullif($test, $compare) {
     return $test === $compare ? NULL : $test;
+}
+
+function enable_error_exceptions(callable $callback) {
+    try {
+        $old_error_handler = set_error_handler(
+            function (int $severity, string $message, string $file, int $line) {
+                if (error_reporting() & $severity) {
+                    throw new ErrorException($message, 0, $severity, $file, $line);
+                }
+            }
+        );
+        $old_error_reporting = error_reporting(E_ALL);
+        return $callback();
+    } finally {
+        error_reporting($old_error_reporting);
+        set_error_handler($old_error_handler);
+    }
 }
