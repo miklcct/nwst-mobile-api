@@ -16,19 +16,20 @@ class StopListParserTest extends TestCase {
         $stops = [
             new RouteStop(
                 Rdv::parse('118-TOS-1')
-                , 5
-                , 1227
-                , '001227B'
-                , 22.264980642091
-                , 114.24170198053001
-                , 'Lok Hin Terrace, Chai Wan Road'
+                , 20
+                , 1552
+                , '001552D'
+                , 22.317345382091
+                , 114.16966019053001
+                , 'Shantung Street, Nathan Road'
                 , 'Sham Shui Po (Tonkin Street)'
                 , 'O'
-                , 10.4
-                , 5.2
-                , 5.2
+                , 6.1
+                , 3.1
+                , 3.1
                 , 'KMB'
                 , '118--Cheung_Sha_Wan_(Sham_Mong_Road)'
+                , 'Grand Plaza, Langham Place, Mong Kok Station'
             )
             , new RouteStop(
                 Rdv::parse('118-TOS-1')
@@ -45,6 +46,7 @@ class StopListParserTest extends TestCase {
                 , NULL
                 , 'KMB'
                 , '118--Cheung_Sha_Wan_(Sham_Mong_Road)'
+                , ''
             )
         ];
         foreach ($stops as $variant) {

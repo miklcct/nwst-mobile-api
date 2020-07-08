@@ -23,6 +23,7 @@ class RouteStop {
         , ?float $seniorFare
         , ?string $jointCompany
         , string $routeId
+        , string $additionalInfo = ''
     ) {
         $this->rdv = $rdv;
         $this->sequence = $sequence;
@@ -38,6 +39,7 @@ class RouteStop {
         $this->routeId = $routeId;
         $this->latitude = $latitude;
         $this->longitude = $longitude;
+        $this->additionalInfo = $additionalInfo;
     }
 
     /**
@@ -96,4 +98,8 @@ class RouteStop {
      * @var string
      */
     public $routeId;
+    /**
+     * @var string
+     */
+    public $additionalInfo;
 }

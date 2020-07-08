@@ -53,6 +53,7 @@ class StopListParser implements ParserInterface {
             // $segments[15] and $segments[16] are the same as $segments[5] and $segments[6]
             , $segments[17] ?: NULL
             , $segments[18]
+            , $segments[19]
         );
     }
 

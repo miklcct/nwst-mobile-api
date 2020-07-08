@@ -1,3 +1,6 @@
+## [1.1.0] - 2020-07-08
+* add additional info into route stop
+
 ## [1.0.2] - 2020-04-19
 * delete the version field in composer.json which prevent releases to be made
 
